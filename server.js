@@ -60,9 +60,12 @@ app.get('/year/:selected_year', (req, res) => {
 	var newPromise = new Promise((resolve,reject) => {
 		db.all('SELECT * FROM Consumption WHERE year=? ORDER BY state_abbreviation', [year], (err, rows)=>{
 			
-		}
+		});
 			
 	})
+	newPromise.then(data => {
+		
+	});
 	
 	// end modification here
         WriteHtml(res, response);
