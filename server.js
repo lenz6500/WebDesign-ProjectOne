@@ -55,6 +55,13 @@ app.get('/year/:selected_year', (req, res) => {
     ReadFile(path.join(template_dir, 'year.html')).then((template) => {
         let response = template;
         // modify `response` here
+	let year = req.url.substring(6);
+	var string = '';
+	var newPromise = new Promise((resolve,reject) => {
+		
+	})
+	
+	// end modification here
         WriteHtml(res, response);
     }).catch((err) => {
         Write404Error(res);
