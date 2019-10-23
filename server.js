@@ -34,22 +34,6 @@ function TestSql(){
 		console.log(rows);
 	});
 	*/
-	var coalTotal = 0;
-	var naturalGasTotal = 0;
-	var nuclearTotal = 0;
-	var petroleumTotal = 0;
-	var renewableTOtal = 0;
-	db.all("SELECT state_abbreviation FROM States", (err, rows) =>{
-
-		for(i = 0; i < rows.length; i++){
-			console.log(rows[i].state_abbreviation);
-			db.all("SELECT coal FROM Consumption WHERE year=2017 AND state_abbreviation=?", [rows[i].state_abbreviation], (err, coalValue)=>{
-				coalTotal = coalTotal + coalValue[0].coal;
-				console.log(coalTotal);
-			});
-			//console.log(coalTotal);
-		}
-	});
 }
 
 app.use(express.static(public_dir));
@@ -58,12 +42,36 @@ app.use(express.static(public_dir));
 // GET request handler for '/'
 app.get('/', (req, res) => {
     ReadFile(path.join(template_dir, 'index.html')).then((template) => {
-        let response = template;
-        // modify `response` here
-        WriteHtml(res, response);
-    }).catch((err) => {
-        Write404Error(res);
-    });
+        var response = template;
+		var coalTotal = 0;
+		var naturalGasTotal = 0;
+		var nuclearTotal = 0;
+		var petroleumTotal = 0;
+		var renewableTotal = 0;
+		db.all("SELECT * FROM Consumption WHERE year = 2017", (err, value)=>{
+			if(err){
+				console.log("Data not found.");
+			}
+			for(i = 0; i < value.length; i++){
+				//console.log(value[i]);
+				coalTotal = coalTotal + value[i].coal;
+				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
+				nuclearTotal = nuclearTotal + value[i].nuclear;
+				petroleumTotal = petroleumTotal + value[i].petroleum;
+				renewableTotal = renewableTotal + value[i].renewable;
+			}	
+			response.replace("!!COALCOUNT!!", coalTotal);
+			response.replace("!!NATURALGASCOUNT!!", naturalGasTotal);
+			response.replace("!!NUCLEARCOUNT!!", nuclearTotal);
+			response.replace("!!PETROLEUMCOUNT!!", petroleumTotal);
+			response.replace("!!RENEWABLECOUNT!!", renewableTotal);
+			WriteHtml(res, response);
+			console.log(response);
+			res.end();
+		});
+	}).catch((err) => {
+		Write404Error(res);
+	});
 });
 
 // GET request handler for '/year/*'
