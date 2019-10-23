@@ -34,9 +34,21 @@ function TestSql(){
 		console.log(rows);
 	});
 	*/
-	
-	db.all("SELECT * FROM States", (err, rows) =>{
-		console.log(rows.state_name);
+	var coalTotal = 0;
+	var naturalGasTotal = 0;
+	var nuclearTotal = 0;
+	var petroleumTotal = 0;
+	var renewableTOtal = 0;
+	db.all("SELECT state_abbreviation FROM States", (err, rows) =>{
+
+		for(i = 0; i < rows.length; i++){
+			console.log(rows[i].state_abbreviation);
+			db.all("SELECT coal FROM Consumption WHERE year=2017 AND state_abbreviation=?", [rows[i].state_abbreviation], (err, coalValue)=>{
+				coalTotal = coalTotal + coalValue[0].coal;
+				console.log(coalTotal);
+			});
+			//console.log(coalTotal);
+		}
 	});
 }
 
