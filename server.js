@@ -34,6 +34,10 @@ function TestSql(){
 		console.log(rows);
 	});
 	*/
+	
+	db.all("SELECT * FROM States", (err, rows) =>{
+		console.log(rows.state_name);
+	});
 }
 
 app.use(express.static(public_dir));
