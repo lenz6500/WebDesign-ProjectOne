@@ -26,12 +26,14 @@ var db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
 });
 
 function TestSql(){
+	/*
 	db.all("SELECT * FROM Consumption WHERE state_abbreviation=? ORDER BY Year", ['MN'], (err, rows)=>{
 		console.log(rows);
 	});
 	db.all("SELECT * FROM States", (err, rows) =>{
 		console.log(rows);
 	});
+	*/
 }
 
 app.use(express.static(public_dir));
