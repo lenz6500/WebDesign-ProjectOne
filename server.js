@@ -42,32 +42,40 @@ app.use(express.static(public_dir));
 // GET request handler for '/'
 app.get('/', (req, res) => {
     ReadFile(path.join(template_dir, 'index.html')).then((template) => {
-        var response = template;
+        let response = template;
 		var coalTotal = 0;
 		var naturalGasTotal = 0;
 		var nuclearTotal = 0;
 		var petroleumTotal = 0;
 		var renewableTotal = 0;
-		db.all("SELECT * FROM Consumption WHERE year = 2017", (err, value)=>{
+		var allStatesData = "";
+		db.all("SELECT * FROM Consumption WHERE year = 2017 ORDER BY Year", (err, value)=>{
 			if(err){
 				console.log("Data not found.");
+				//Proper 404 error here later.
 			}
 			for(i = 0; i < value.length; i++){
-				//console.log(value[i]);
+				allStatesData = allStatesData + "\t\t<tr>";
+				allStatesData = allStatesData + "<td>"+value[i].state_abbreviation+"</td>";
 				coalTotal = coalTotal + value[i].coal;
+				allStatesData = allStatesData + "<td>"+value[i].coal+"</td>";
 				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
+				allStatesData = allStatesData + "<td>"+value[i].natural_gas+"</td>";
 				nuclearTotal = nuclearTotal + value[i].nuclear;
+				allStatesData = allStatesData + "<td>"+value[i].nuclear+"</td>";
 				petroleumTotal = petroleumTotal + value[i].petroleum;
+				allStatesData = allStatesData + "<td>"+value[i].petroleum+"</td>";
 				renewableTotal = renewableTotal + value[i].renewable;
-			}	
-			response.replace("!!COALCOUNT!!", coalTotal);
-			response.replace("!!NATURALGASCOUNT!!", naturalGasTotal);
-			response.replace("!!NUCLEARCOUNT!!", nuclearTotal);
-			response.replace("!!PETROLEUMCOUNT!!", petroleumTotal);
-			response.replace("!!RENEWABLECOUNT!!", renewableTotal);
+				allStatesData = allStatesData + "<td>"+value[i].renewable+"</td>";
+				allStatesData = allStatesData + "</tr>\n";
+			}
+			response = response.replace("!!TABLE!!", allStatesData);
+			response = response.replace("!!COALCOUNT!!", coalTotal);
+			response = response.replace("!!NATURALGASCOUNT!!", naturalGasTotal);
+			response = response.replace("!!NUCLEARCOUNT!!", nuclearTotal);
+			response = response.replace("!!PETROLEUMCOUNT!!", petroleumTotal);
+			response = response.replace("!!RENEWABLECOUNT!!", renewableTotal);
 			WriteHtml(res, response);
-			console.log(response);
-			res.end();
 		});
 	}).catch((err) => {
 		Write404Error(res);
@@ -78,24 +86,53 @@ app.get('/', (req, res) => {
 app.get('/year/:selected_year', (req, res) => {
     ReadFile(path.join(template_dir, 'year.html')).then((template) => {
         let response = template;
-        // modify `response` here
-	let year = req.url.substring(6);
-	var string = '';
-	var newPromise = new Promise((resolve,reject) => {
-		db.all('SELECT * FROM Consumption WHERE year=? ORDER BY state_abbreviation', [year], (err, rows)=>{
-			
+		var year = req.url.substring(6);
+		var coalTotal = 0;
+		var naturalGasTotal = 0;
+		var nuclearTotal = 0;
+		var petroleumTotal = 0;
+		var renewableTotal = 0;
+		var stateTotal = 0;
+		var allStatesData = "";
+		db.all("SELECT * FROM Consumption WHERE year = ? ORDER BY Year", [year], (err, value)=>{
+			if(err){
+				console.log("Data not found.");
+				//Proper 404 error here for later.
+			}
+			for(i = 0; i < value.length; i++){
+				allStatesData = allStatesData + "\t\t<tr>";
+				allStatesData = allStatesData + "<td>"+value[i].state_abbreviation+"</td>";
+				coalTotal = coalTotal + value[i].coal;
+				stateTotal = stateTotal + value[i].coal;
+				allStatesData = allStatesData + "<td>"+value[i].coal+"</td>";
+				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
+				stateTotal = stateTotal + value[i].natural_gas;
+				allStatesData = allStatesData + "<td>"+value[i].natural_gas+"</td>";
+				nuclearTotal = nuclearTotal + value[i].nuclear;
+				stateTotal = stateTotal + value[i].nuclear;
+				allStatesData = allStatesData + "<td>"+value[i].nuclear+"</td>";
+				petroleumTotal = petroleumTotal + value[i].petroleum;
+				stateTotal = stateTotal + value[i].petroleum;
+				allStatesData = allStatesData + "<td>"+value[i].petroleum+"</td>";
+				renewableTotal = renewableTotal + value[i].renewable;
+				stateTotal = stateTotal + value[i].renewable;
+				allStatesData = allStatesData + "<td>"+value[i].renewable+"</td>";
+				allStatesData = allStatesData + "<td>"+stateTotal+"</td";
+				allStatesData = allStatesData + "</tr>\n";
+			}
+			response = response.replace("!!YEAR!!", year);
+			response = response.replace("!!YEAR!!", year);
+			response = response.replace("!!TABLE!!", allStatesData);
+			response = response.replace("!!COALCOUNT!!", coalTotal);
+			response = response.replace("!!NATURALGASCOUNT!!", naturalGasTotal);
+			response = response.replace("!!NUCLEARCOUNT!!", nuclearTotal);
+			response = response.replace("!!PETROLEUMCOUNT!!", petroleumTotal);
+			response = response.replace("!!RENEWABLECOUNT!!", renewableTotal);
+			WriteHtml(res, response);
 		});
-			
-	})
-	newPromise.then(data => {
-		
+	}).catch((err) => {
+		Write404Error(res);
 	});
-	
-	// end modification here
-        WriteHtml(res, response);
-    }).catch((err) => {
-        Write404Error(res);
-    });
 });
 
 // GET request handler for '/state/*'
