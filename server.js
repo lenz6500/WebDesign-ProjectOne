@@ -139,8 +139,38 @@ app.get('/year/:selected_year', (req, res) => {
 app.get('/state/:selected_state', (req, res) => {
     ReadFile(path.join(template_dir, 'state.html')).then((template) => {
         let response = template;
-        // modify `response` here
-        WriteHtml(res, response);
+		var state = req.url.substring(7);
+		var coalString = "[";
+		var naturalGasString = "[";
+		var nuclearString = "[";
+		var petroleumString = "[";
+		var renewableString = "[";
+		//console.log(state);
+        db.all("SELECT * FROM Consumption WHERE state_abbreviation = ? ORDER BY Year", [state], (err, value)=>{
+			var i = 0;
+			while(i < value.length-1){
+				coalString = coalString + value[i].coal + ", ";
+				naturalGasString = naturalGasString + value[i].natural_gas + ", ";
+				nuclearString = nuclearString + value[i].nuclear + ", ";
+				petroleumString = petroleumString + value[i].petroleum + ", ";
+				renewableString = renewableString + value[i].renewable + ", ";
+				i++;
+			}
+			coalString = coalString + value[i].coal+ "]";
+			naturalGasString = naturalGasString + value[i].natural_gas +"]";
+			nuclearString = nuclearString + value[i].nuclear +"]";
+			petroleumString = petroleumString + value[i].petroleum +"]";
+			renewableString = renewableString + value[i].renewable + "]";
+
+			response = response.replace("!!STATE!!", state);
+			response = response.replace("!!STATE!!", state);
+			response = response.replace("!!COAL!!", coalString);
+			response = response.replace("!!NAT!!", naturalGasString);
+			response = response.replace("!!NUKE!!", nuclearString);
+			response = response.replace("!!PETRO!!", petroleumString);
+			response = response.replace("!!RENEW!!", renewableString);
+			WriteHtml(res, response);
+		});
     }).catch((err) => {
         Write404Error(res);
     });
