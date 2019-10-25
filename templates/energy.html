@@ -11,8 +11,8 @@
     <script type="application/javascript" src="/scripts/energyvis.js"></script>
     <script type="application/javascript">
         // `energy_type` and object of consumption per year per state --> set these variables equal to appropriate value
-        var energy_type;
-        var energy_counts;  // e.g. {AK: [...], AL: [...], AR: [...], ...}
+        var energy_type = "!!ETYPE!!";
+        var energy_counts; // e.g. {AK: [...], AL: [...], AR: [...], ...}
     </script>
 </head>
 <body onload="Init()">
@@ -41,7 +41,7 @@
 
             <div>
                 <div class="left">
-                    <h2>Consumption Snapshot</h2> <!-- change header to include energy type (e.g. Coal Consumption Snaphot) -->
+                    <h2>!!TYPE!! Consumption Snapshot</h2> <!-- change header to include energy type (e.g. Coal Consumption Snaphot) -->
                 </div>
                 <div class="right">
                     <a class="prev_next" href="">XX</a> <!-- change XX to prev enery type, link to Renewable if energy is Coal -->

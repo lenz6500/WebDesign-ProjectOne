@@ -57,17 +57,17 @@ app.get('/', (req, res) => {
 			for(i = 0; i < value.length; i++){
 				allStatesData = allStatesData + "\t\t<tr>";
 				allStatesData = allStatesData + "<td>"+value[i].state_abbreviation+"</td>";
-				coalTotal = coalTotal + value[i].coal;
 				allStatesData = allStatesData + "<td>"+value[i].coal+"</td>";
-				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
 				allStatesData = allStatesData + "<td>"+value[i].natural_gas+"</td>";
-				nuclearTotal = nuclearTotal + value[i].nuclear;
 				allStatesData = allStatesData + "<td>"+value[i].nuclear+"</td>";
-				petroleumTotal = petroleumTotal + value[i].petroleum;
 				allStatesData = allStatesData + "<td>"+value[i].petroleum+"</td>";
-				renewableTotal = renewableTotal + value[i].renewable;
 				allStatesData = allStatesData + "<td>"+value[i].renewable+"</td>";
 				allStatesData = allStatesData + "</tr>\n";
+				coalTotal = coalTotal + value[i].coal;
+				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
+				nuclearTotal = nuclearTotal + value[i].nuclear;
+				petroleumTotal = petroleumTotal + value[i].petroleum;
+				renewableTotal = renewableTotal + value[i].renewable;
 			}
 			response = response.replace("!!TABLE!!", allStatesData);
 			response = response.replace("!!COALCOUNT!!", coalTotal);
@@ -100,25 +100,25 @@ app.get('/year/:selected_year', (req, res) => {
 				//Proper 404 error here for later.
 			}
 			for(i = 0; i < value.length; i++){
+				stateTotal = stateTotal + value[i].coal;
+				stateTotal = stateTotal + value[i].natural_gas;
+				stateTotal = stateTotal + value[i].nuclear;
+				stateTotal = stateTotal + value[i].petroleum;
+				stateTotal = stateTotal + value[i].renewable;
 				allStatesData = allStatesData + "\t\t<tr>";
 				allStatesData = allStatesData + "<td>"+value[i].state_abbreviation+"</td>";
-				coalTotal = coalTotal + value[i].coal;
-				stateTotal = stateTotal + value[i].coal;
 				allStatesData = allStatesData + "<td>"+value[i].coal+"</td>";
-				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
-				stateTotal = stateTotal + value[i].natural_gas;
 				allStatesData = allStatesData + "<td>"+value[i].natural_gas+"</td>";
-				nuclearTotal = nuclearTotal + value[i].nuclear;
-				stateTotal = stateTotal + value[i].nuclear;
 				allStatesData = allStatesData + "<td>"+value[i].nuclear+"</td>";
-				petroleumTotal = petroleumTotal + value[i].petroleum;
-				stateTotal = stateTotal + value[i].petroleum;
 				allStatesData = allStatesData + "<td>"+value[i].petroleum+"</td>";
-				renewableTotal = renewableTotal + value[i].renewable;
-				stateTotal = stateTotal + value[i].renewable;
 				allStatesData = allStatesData + "<td>"+value[i].renewable+"</td>";
 				allStatesData = allStatesData + "<td>"+stateTotal+"</td";
 				allStatesData = allStatesData + "</tr>\n";
+				coalTotal = coalTotal + value[i].coal;
+				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
+				nuclearTotal = nuclearTotal + value[i].nuclear;
+				petroleumTotal = petroleumTotal + value[i].petroleum;
+				renewableTotal = renewableTotal + value[i].renewable;
 			}
 			response = response.replace("!!YEAR!!", year);
 			response = response.replace("!!YEAR!!", year);
@@ -152,46 +152,47 @@ app.get('/state/:selected_state', (req, res) => {
         db.all("SELECT * FROM Consumption WHERE state_abbreviation = ? ORDER BY Year", [state], (err, value)=>{
 			var i = 0;
 			while(i < value.length-1){
+				
+				yearTotal = yearTotal + value[i].coal;
+				yearTotal = yearTotal + value[i].natural_gas;
+				yearTotal = yearTotal + value[i].nuclear;
+				yearTotal = yearTotal + value[i].petroleum;
+				yearTotal = yearTotal + value[i].renewable;
 				allYearsData = allYearsData + "\t\t<tr>";
 				allYearsData = allYearsData + "<td>"+value[i].year + "</td>";
-				coalString = coalString + value[i].coal + ", ";
 				allYearsData = allYearsData + "<td>"+value[i].coal + "</td>";
-				yearTotal = yearTotal + value[i].coal;
-				naturalGasString = naturalGasString + value[i].natural_gas + ", ";
 				allYearsData = allYearsData + "<td>"+value[i].natural_gas + "</td>";
-				yearTotal = yearTotal + value[i].natural_gas;
-				nuclearString = nuclearString + value[i].nuclear + ", ";
 				allYearsData = allYearsData + "<td>"+value[i].nuclear + "</td>";
-				yearTotal = yearTotal + value[i].nuclear;
-				petroleumString = petroleumString + value[i].petroleum + ", ";
 				allYearsData = allYearsData + "<td>"+value[i].petroleum + "</td>";
-				yearTotal = yearTotal + value[i].petroleum;
-				renewableString = renewableString + value[i].renewable + ", ";
 				allYearsData = allYearsData + "<td>"+value[i].renewable + "</td>";
-				yearTotal = yearTotal + value[i].renewable;
 				allYearsData = allYearsData + "<td>" + yearTotal + "</td>";
 				allYearsData = allYearsData + "</tr>\n";
+				coalString = coalString + value[i].coal + ", ";
+				naturalGasString = naturalGasString + value[i].natural_gas + ", ";
+				nuclearString = nuclearString + value[i].nuclear + ", ";
+				petroleumString = petroleumString + value[i].petroleum + ", ";
+				renewableString = renewableString + value[i].renewable + ", ";
 				i++;
 			}
+			yearTotal = yearTotal + value[i].coal;
+			yearTotal = yearTotal + value[i].natural_gas;
+			yearTotal = yearTotal + value[i].nuclear;
+			yearTotal = yearTotal + value[i].petroleum;
+			yearTotal = yearTotal + value[i].renewable;
 			allYearsData = allYearsData + "\t\t<tr>";
 			allYearsData = allYearsData + "<td>"+value[i].year + "</td>";
-			coalString = coalString + value[i].coal+ "]";
 			allYearsData = allYearsData + "<td>"+value[i].coal + "</td>";
-			yearTotal = yearTotal + value[i].coal;
-			naturalGasString = naturalGasString + value[i].natural_gas +"]";
 			allYearsData = allYearsData + "<td>"+value[i].natural_gas + "</td>";
-			yearTotal = yearTotal + value[i].natural_gas;
-			nuclearString = nuclearString + value[i].nuclear +"]";
 			allYearsData = allYearsData + "<td>"+value[i].nuclear + "</td>";
-			yearTotal = yearTotal + value[i].nuclear;
-			petroleumString = petroleumString + value[i].petroleum +"]";
 			allYearsData = allYearsData + "<td>"+value[i].petroleum + "</td>";
-			yearTotal = yearTotal + value[i].petroleum;
-			renewableString = renewableString + value[i].renewable + "]";
 			allYearsData = allYearsData + "<td>"+value[i].renewable + "</td>";
-			yearTotal = yearTotal + value[i].renewable;
 			allYearsData = allYearsData + "<td>" + yearTotal + "</td>";
 			allYearsData = allYearsData + "</tr>\n";
+			coalString = coalString + value[i].coal+ "]";
+			naturalGasString = naturalGasString + value[i].natural_gas +"]";
+			nuclearString = nuclearString + value[i].nuclear +"]";
+			petroleumString = petroleumString + value[i].petroleum +"]";
+			renewableString = renewableString + value[i].renewable + "]";
 
 			response = response.replace("!!STATE!!", state);
 			response = response.replace("!!STATE!!", state);
@@ -214,7 +215,37 @@ app.get('/state/:selected_state', (req, res) => {
 app.get('/energy-type/:selected_energy_type', (req, res) => {
     ReadFile(path.join(template_dir, 'energy.html')).then((template) => {
         let response = template;
-        // modify `response` here
+		console.log(req.url.substring(13));
+		var type = req.url.substring(13);
+		var currState = "";
+		var allStates = "{";
+		var i = 0;
+		var j = 0;
+		db.all("SELECT state_abbreviation, coal FROM Consumption ORDER BY state_abbreviation, Year", (err, rows)=>{
+			console.log(rows.length/51);
+			
+			while(i < 50){
+				j = 0;
+				console.log(rows[51*i].state_abbreviation);
+				currState = rows[51*i].state_abbreviation + ": [";
+				while(j < (rows.length/51) - 1){
+					currState = currState + rows[(51*i)+j][type] + ", ";
+					j++;
+				}
+				currState = currState + rows[(51*i)+j][type] + "], \n";
+				allStates = allStates + currState;
+				i++;
+			}
+			currState = currState + rows[(51*i)+j][type] + "]\n";
+			allStates = allStates + currState;
+			
+			
+			//console.log(allStates);
+		});
+		
+
+		response = response.replace("!!ETYPE!!", type);
+		response = response.replace("!!TYPE!!", type.charAt(0).toUpperCase() + req.url.substring(14));
 	    	      
         WriteHtml(res, response);
     }).catch((err) => {
@@ -246,6 +277,5 @@ function WriteHtml(res, html) {
     res.write(html);
     res.end();
 }
-
 
 var server = app.listen(port);
