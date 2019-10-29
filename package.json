@@ -3,14 +3,10 @@
     "version": "0.0.0",
     "description": "Dynamic Web Server using Node JS",
     "author": {
-        "name": "",
-        "email": ""
+        "name": "Devin Lenz",
+        "email": "lenz6500@stthomas.edu"
     },
     "contributors": [
-        {
-            "name": "",
-            "email": ""
-        },
         {
             "name": "",
             "email": ""
