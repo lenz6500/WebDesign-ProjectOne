@@ -3,16 +3,15 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <title>US Energy Consumption</title> <!-- change title to include state (e.g. MN Energy Consumption) -->
+    <title>!!STATE!! Energy Consumption</title> <!-- change title to include state (e.g. MN Energy Consumption) -->
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.anychart.com/releases/8.7.0/js/anychart-core.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.7.0/js/anychart-cartesian.min.js"></script>
     <script type="application/javascript" src="/scripts/viewselect.js"></script>
     <script type="application/javascript" src="/scripts/statevis.js"></script>
     <script type="application/javascript">
-        // `state` and arrays of consumption per year --> set these variables equal to appropriate value
         var state = "!!STATE!!";
-        var coal_counts = !!COAL!!;  // e.g. [1234, 2567, ...]
+        var coal_counts = !!COAL!!;
         var natural_gas_counts = !!NAT!!;
         var nuclear_counts = !!NUKE!!;
         var petroleum_counts = !!PETRO!!;

@@ -152,6 +152,7 @@ app.get('/year/:selected_year', (req, res) => {
 				response = response.replace("!!NEXT!!", nextLink);
 				response = response.replace("!!YEAR!!", year);
 				response = response.replace("!!YEAR!!", year);
+				response = response.replace("!!YEAR!!", year);
 				response = response.replace("!!TABLE!!", allStatesData);
 				response = response.replace("!!COALCOUNT!!", coalTotal);
 				response = response.replace("!!NATURALGASCOUNT!!", naturalGasTotal);
@@ -244,6 +245,7 @@ app.get('/state/:selected_state', (req, res) => {
 					response = response.replace("!!PREVSTATE!!", prevLink.substring(7));
 					response = response.replace("!!NEXTSTATE!!", nextLink.substring(7));
 					response = response.replace("!!STATE!!", state);
+					response = response.replace("!!STATE!!", state);
 					response = response.replace("!!FULLSTATE!!", value1[0].state_name);
 					response = response.replace("!!COAL!!", coalString);
 					response = response.replace("!!NAT!!", naturalGasString);
@@ -276,11 +278,12 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
 		var img = "/images/" + req.url.substring(13) + ".png"		
 		var types = ["coal", "natural_gas", "nuclear", "petroleum", "renewable"];
 		var names = ["Coal", "Natural Gas", "Nuclear", "Petroleum", "Renewable"];
+		var alt = req.url.substring(13);
 		
 		db.all("SELECT * FROM Consumption ORDER BY state_abbreviation, Year", (err, rows)=>{
 			if(rows[0][type]==undefined){
 				res.writeHead(404, {'Content-Type': 'text/plain'});
-				res.write("Error: data for type " + type + " was not found.");
+				res.write("Error: data for energy type " + type + " was not found.");
 				res.end();
 			} else {	
 				while(i < 51){
@@ -327,7 +330,9 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
 					response = response.replace("!!TABLE!!", tableStates);
 					response = response.replace("!!COUNTS!!", allStates);
 					response = response.replace("!!ETYPE!!", type);
-					response = response.replace("!!TYPE!!", type.charAt(0).toUpperCase() + req.url.substring(14));
+					response = response.replace("!!ENTYPE!!", names[index%5]);
+					response = response.replace("!!TYPE!!", names[index%5]);
+					response = response.replace("!!ALT!!", alt);
 					WriteHtml(res, response);			
 				});
 			}

@@ -8,14 +8,14 @@
     },
     "contributors": [
         {
-            "name": "",
-            "email": ""
+            "name": "Danielle Pierre",
+            "email": "pier8785@stthomas.edu"
         }
     ],
     "main": "server.js",
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "https://github.com/lenz6500/WebDesign-ProjectOne"
     },
     "dependencies": {
         "express": "^4.17.1",
