@@ -215,39 +215,56 @@ app.get('/state/:selected_state', (req, res) => {
 app.get('/energy-type/:selected_energy_type', (req, res) => {
     ReadFile(path.join(template_dir, 'energy.html')).then((template) => {
         let response = template;
-		console.log(req.url.substring(13));
 		var type = req.url.substring(13);
 		var currState = "";
 		var allStates = "{";
 		var i = 0;
 		var j = 0;
-		db.all("SELECT state_abbreviation, coal FROM Consumption ORDER BY state_abbreviation, Year", (err, rows)=>{
-			console.log(rows.length/51);
-			
-			while(i < 50){
+		var tableStates = "";
+		var yearTotal;
+		var img = "/images/" + req.url.substring(13) + ".png"
+		db.all("SELECT * FROM Consumption ORDER BY state_abbreviation, Year", (err, rows)=>{
+
+			while(i < 51){
 				j = 0;
-				console.log(rows[51*i].state_abbreviation);
-				currState = rows[51*i].state_abbreviation + ": [";
+				
+				currState = rows[(rows.length/51)*i].state_abbreviation + ": [";
 				while(j < (rows.length/51) - 1){
-					currState = currState + rows[(51*i)+j][type] + ", ";
+					currState = currState + rows[((rows.length/51)*i)+j][type] + ", ";
 					j++;
 				}
-				currState = currState + rows[(51*i)+j][type] + "], \n";
+				currState = currState + rows[((rows.length/51)*i)+j][type] + "], \n";
 				allStates = allStates + currState;
 				i++;
 			}
-			currState = currState + rows[(51*i)+j][type] + "]\n";
-			allStates = allStates + currState;
-			
-			
-			//console.log(allStates);
-		});
-		
-
-		response = response.replace("!!ETYPE!!", type);
-		response = response.replace("!!TYPE!!", type.charAt(0).toUpperCase() + req.url.substring(14));
-	    	      
-        WriteHtml(res, response);
+			allStates = allStates.substring(0, allStates.length-3);
+			allStates = allStates + "}";
+			db.all("SELECT * FROM Consumption ORDER BY Year, state_abbreviation", (err2, rows2)=>{
+				
+				i = 0;
+				while(i < (rows2.length/51)){
+					j = 0;
+					yearTotal = 0;
+					tableStates = tableStates + "\t\t<tr>";
+					tableStates = tableStates + "<td>"+rows2[51*i].year+"</td>";		
+					while(j < 51){
+						tableStates = tableStates + "<td>" + rows2[(51*i) + j][type] + "</td>";
+						yearTotal = yearTotal + rows2[(51*i) + j][type];
+						j++;
+					}
+					tableStates = tableStates + "<td>" + yearTotal + "</td>";
+					tableStates = tableStates + "</tr>\n";
+					i++;
+				}
+				
+				response = response.replace("!!IMAGE!!", img);
+				response = response.replace("!!TABLE!!", tableStates);
+				response = response.replace("!!COUNTS!!", allStates);
+				response = response.replace("!!ETYPE!!", type);
+				response = response.replace("!!TYPE!!", type.charAt(0).toUpperCase() + req.url.substring(14));
+				WriteHtml(res, response);			
+			});
+		});    	      
     }).catch((err) => {
         Write404Error(res);
     });
