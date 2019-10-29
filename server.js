@@ -25,6 +25,32 @@ var db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
     }
 });
 
+function getButtons(value){
+	
+	var states = ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"];
+	
+	var index = states.indexOf(value);
+	
+	if(index == -1){
+		
+		var high = parseInt(value, 10)+1;
+		var low = parseInt(value, 10)-1;
+		
+		if(value == "1960"){
+			//console.log("hello");
+			return value + " " + high;
+		}else if (value == "2017"){
+			return low + " " + (value);
+		}else{
+			//console.log(low + " " + high);
+			return low + " " + high;
+		}
+	}
+	
+	index = index + 51;
+	return states[(index-1)%51] + " " + states[(index+1)%51];
+}
+
 function TestSql(){
 	/*
 	db.all("SELECT * FROM Consumption WHERE state_abbreviation=? ORDER BY Year", ['MN'], (err, rows)=>{
@@ -37,7 +63,6 @@ function TestSql(){
 }
 
 app.use(express.static(public_dir));
-
 
 // GET request handler for '/'
 app.get('/', (req, res) => {
@@ -120,6 +145,13 @@ app.get('/year/:selected_year', (req, res) => {
 				petroleumTotal = petroleumTotal + value[i].petroleum;
 				renewableTotal = renewableTotal + value[i].renewable;
 			}
+			var prevLink = getButtons(year);
+			var nextLink = getButtons(year);			
+			prevLink = '/year/' + prevLink.substring(0, 4);
+			nextLink = '/year/'  + nextLink.substring(5);
+			
+			response = response.replace("!!PREV!!", prevLink);
+			response = response.replace("!!NEXT!!", nextLink);
 			response = response.replace("!!YEAR!!", year);
 			response = response.replace("!!YEAR!!", year);
 			response = response.replace("!!TABLE!!", allStatesData);
@@ -128,7 +160,7 @@ app.get('/year/:selected_year', (req, res) => {
 			response = response.replace("!!NUCLEARCOUNT!!", nuclearTotal);
 			response = response.replace("!!PETROLEUMCOUNT!!", petroleumTotal);
 			response = response.replace("!!RENEWABLECOUNT!!", renewableTotal);
-			WriteHtml(res, response);
+			WriteHtml(res, response);				
 		});
 	}).catch((err) => {
 		Write404Error(res);
@@ -193,7 +225,18 @@ app.get('/state/:selected_state', (req, res) => {
 			nuclearString = nuclearString + value[i].nuclear +"]";
 			petroleumString = petroleumString + value[i].petroleum +"]";
 			renewableString = renewableString + value[i].renewable + "]";
-
+			
+			var prevLink = getButtons(state);
+			var nextLink = getButtons(state);
+			
+			var prevLink = '/state/' + prevLink.substring(0, 2);
+			var nextLink = '/state/' + nextLink.substring(3);
+			
+			
+			response = response.replace("!!PREV!!", prevLink);
+			response = response.replace("!!NEXT!!", nextLink);
+			response = response.replace("!!PREVSTATE!!", prevLink.substring(7));
+			response = response.replace("!!NEXTSTATE!!", nextLink.substring(7));
 			response = response.replace("!!STATE!!", state);
 			response = response.replace("!!STATE!!", state);
 			response = response.replace("!!COAL!!", coalString);
@@ -222,7 +265,9 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
 		var j = 0;
 		var tableStates = "";
 		var yearTotal;
-		var img = "/images/" + req.url.substring(13) + ".png"
+		var img = "/images/" + req.url.substring(13) + ".png"		
+		var types = ["coal", "natural_gas", "nuclear", "petroleum", "renewable"];
+		
 		db.all("SELECT * FROM Consumption ORDER BY state_abbreviation, Year", (err, rows)=>{
 
 			while(i < 51){
@@ -256,7 +301,18 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
 					tableStates = tableStates + "</tr>\n";
 					i++;
 				}
+				var index = types.indexOf(type);
+				index = index + 5;
+				var prevLink = "/images/" + types[(index-1)%5];
+				var nextLink = "/images/" + types[(index+1)%5];
 				
+				console.log(prevLink);
+				console.log(nextLink);
+				
+				response = response.replace("!!PREV!!", prevLink);
+				response = response.replace("!!NEXT!!", nextLink);
+				response = response.replace("!!PREVTYPE!!", prevLink.substring(8));
+				response = response.replace("!!NEXTTYPE!!", nextLink.substring(8));
 				response = response.replace("!!IMAGE!!", img);
 				response = response.replace("!!TABLE!!", tableStates);
 				response = response.replace("!!COUNTS!!", allStates);
