@@ -26,15 +26,16 @@ var db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
 });
 
 function getButtons(value){
-	
+	//create the prev and next buttons for year and state pages.
 	var states = ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"];
 	
 	var index = states.indexOf(value);
 	
+	//not a state, so must be a integer value.
 	if(index == -1){
 		var high = parseInt(value, 10)+1;
 		var low = parseInt(value, 10)-1;
-		
+		//low case, high case, and every other case. 
 		if(value == "1960"){
 			return value + " " + high;
 		}else if (value == "2017"){
@@ -77,6 +78,7 @@ app.get('/', (req, res) => {
 				//Proper 404 error here later.
 			}
 			for(i = 0; i < value.length; i++){
+				//Build up table row for insertion into table. 
 				allStatesData = allStatesData + "\t\t<tr>";
 				allStatesData = allStatesData + "<td>"+value[i].state_abbreviation+"</td>";
 				allStatesData = allStatesData + "<td>"+value[i].coal+"</td>";
@@ -85,6 +87,7 @@ app.get('/', (req, res) => {
 				allStatesData = allStatesData + "<td>"+value[i].petroleum+"</td>";
 				allStatesData = allStatesData + "<td>"+value[i].renewable+"</td>";
 				allStatesData = allStatesData + "</tr>\n";
+				//Update type integer values.
 				coalTotal = coalTotal + value[i].coal;
 				naturalGasTotal = naturalGasTotal + value[i].natural_gas;
 				nuclearTotal = nuclearTotal + value[i].nuclear;
@@ -117,17 +120,19 @@ app.get('/year/:selected_year', (req, res) => {
 		var stateTotal = 0;
 		var allStatesData = "";
 		db.all("SELECT * FROM Consumption WHERE year = ? ORDER BY Year", [year], (err, value)=>{
-			if(value.length < 1){
+			if(value.length < 1){ //Error handler.
 				res.writeHead(404, {'Content-Type': 'text/plain'});
 				res.write("Error: data for year " + year + " was not found.");
 				res.end();
 			} else {
 				for(i = 0; i < value.length; i++){
+					//Build up total value of all five types.
 					stateTotal = stateTotal + value[i].coal;
 					stateTotal = stateTotal + value[i].natural_gas;
 					stateTotal = stateTotal + value[i].nuclear;
 					stateTotal = stateTotal + value[i].petroleum;
 					stateTotal = stateTotal + value[i].renewable;
+					//Build up table row for insertion into table. 
 					allStatesData = allStatesData + "\t\t<tr>";
 					allStatesData = allStatesData + "<td>"+value[i].state_abbreviation+"</td>";
 					allStatesData = allStatesData + "<td>"+value[i].coal+"</td>";
@@ -137,6 +142,7 @@ app.get('/year/:selected_year', (req, res) => {
 					allStatesData = allStatesData + "<td>"+value[i].renewable+"</td>";
 					allStatesData = allStatesData + "<td>"+stateTotal+"</td";
 					allStatesData = allStatesData + "</tr>\n";
+					//Update type integer values.
 					coalTotal = coalTotal + value[i].coal;
 					naturalGasTotal = naturalGasTotal + value[i].natural_gas;
 					nuclearTotal = nuclearTotal + value[i].nuclear;
@@ -148,6 +154,7 @@ app.get('/year/:selected_year', (req, res) => {
 				prevLink = '/year/' + prevLink.substring(0, 4);
 				nextLink = '/year/'  + nextLink.substring(5);
 			
+				//Replace various sections in HTML template.
 				response = response.replace("!!PREV!!", prevLink);
 				response = response.replace("!!NEXT!!", nextLink);
 				response = response.replace("!!YEAR!!", year);
@@ -183,19 +190,21 @@ app.get('/state/:selected_state', (req, res) => {
 		var img = "/images/" + req.url.substring(7) + ".png"
 		var alt = req.url.substring(7);
         db.all("SELECT * FROM Consumption WHERE state_abbreviation = ? ORDER BY Year", [state], (err, value)=>{
-			if(value.length < 1){
+			if(value.length < 1){ //Error Handler.
 				res.writeHead(404, {'Content-Type': 'text/plain'});
 				res.write("Error: data for state " + state + " was not found.");
 				res.end();
 			} else {			
 				var i = 0;
 				while(i < value.length-1){
-				
+					
+					//Build up total value of all five types.
 					yearTotal = yearTotal + value[i].coal;
 					yearTotal = yearTotal + value[i].natural_gas;
 					yearTotal = yearTotal + value[i].nuclear;
 					yearTotal = yearTotal + value[i].petroleum;
 					yearTotal = yearTotal + value[i].renewable;
+					//Build up table row for insertion into table. 
 					allYearsData = allYearsData + "\t\t<tr>";
 					allYearsData = allYearsData + "<td>"+value[i].year + "</td>";
 					allYearsData = allYearsData + "<td>"+value[i].coal + "</td>";
@@ -205,6 +214,7 @@ app.get('/state/:selected_state', (req, res) => {
 					allYearsData = allYearsData + "<td>"+value[i].renewable + "</td>";
 					allYearsData = allYearsData + "<td>" + yearTotal + "</td>";
 					allYearsData = allYearsData + "</tr>\n";
+					//Update type integer values.
 					coalString = coalString + value[i].coal + ", ";
 					naturalGasString = naturalGasString + value[i].natural_gas + ", ";
 					nuclearString = nuclearString + value[i].nuclear + ", ";
@@ -212,6 +222,7 @@ app.get('/state/:selected_state', (req, res) => {
 					renewableString = renewableString + value[i].renewable + ", ";
 					i++;
 				}
+				//Section is for final loop to close off arrays.
 				yearTotal = yearTotal + value[i].coal;
 				yearTotal = yearTotal + value[i].natural_gas;
 				yearTotal = yearTotal + value[i].nuclear;
@@ -234,12 +245,12 @@ app.get('/state/:selected_state', (req, res) => {
 			
 				var prevLink = getButtons(state);
 				var nextLink = getButtons(state);
-			
+				//Create buttons.
 				var prevLink = '/state/' + prevLink.substring(0, 2);
 				var nextLink = '/state/' + nextLink.substring(3);
 			
 				db.all("SELECT * FROM States WHERE state_abbreviation = ?", [state], (err, value1)=>{		
-				
+					//Replace various sections in HTML template.
 					response = response.replace("!!PREV!!", prevLink);
 					response = response.replace("!!NEXT!!", nextLink);
 					response = response.replace("!!PREVSTATE!!", prevLink.substring(7));
@@ -281,12 +292,12 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
 		var alt = req.url.substring(13);
 		
 		db.all("SELECT * FROM Consumption ORDER BY state_abbreviation, Year", (err, rows)=>{
-			if(rows[0][type]==undefined){
+			if(rows[0][type]==undefined){ //Error handler.
 				res.writeHead(404, {'Content-Type': 'text/plain'});
 				res.write("Error: data for energy type " + type + " was not found.");
 				res.end();
 			} else {	
-				while(i < 51){
+				while(i < 51){ //Create the arrays for each state at a time. 
 					j = 0;
 				
 					currState = rows[(rows.length/51)*i].state_abbreviation + ": [";
@@ -303,7 +314,7 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
 				db.all("SELECT * FROM Consumption ORDER BY Year, state_abbreviation", (err2, rows2)=>{
 				
 					i = 0;
-					while(i < (rows2.length/51)){
+					while(i < (rows2.length/51)){ //Create rows for all states for a particular year.
 						j = 0;
 						yearTotal = 0;
 						tableStates = tableStates + "\t\t<tr>";
@@ -342,7 +353,7 @@ app.get('/energy-type/:selected_energy_type', (req, res) => {
     });
 });
 
-function ReadFile(filename) {
+function ReadFile(filename) { //Simple read file option.
     return new Promise((resolve, reject) => {
         fs.readFile(filename, (err, data) => {
             if (err) {
